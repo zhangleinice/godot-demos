@@ -83,7 +83,7 @@ public partial class Player : Area2D
 	{
 		// 玩家被撞后隐藏
 		Hide(); // Player disappears after being hit.
-		// 发射 Hit 信号
+				// 发射 Hit 信号
 		EmitSignal(SignalName.Hit);
 		// CollisionShape2D节点，等这一帧结束以后再改。
 		// Must be deferred as we can't change physics properties on a physics callback.

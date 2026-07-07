@@ -9,8 +9,7 @@ public partial class Main : Node
 
 	public override void _Ready()
 	{
-		GD.Print("Main Ready");
-		NewGame();
+		// NewGame();
 	}
 
 	public override void _Process(double delta)
@@ -19,8 +18,14 @@ public partial class Main : Node
 
 	public void GameOver()
 	{
+		GD.Print("GameOver");
 		GetNode<Timer>("MobTimer").Stop();
 		GetNode<Timer>("ScoreTimer").Stop();
+		GetNode<Hud>("HUD").ShowGameOver();
+
+		// 播放音效
+		GetNode<AudioStreamPlayer>("Music").Stop();
+		GetNode<AudioStreamPlayer>("DeathSound").Play();
 	}
 
 	public void NewGame()
@@ -32,16 +37,25 @@ public partial class Main : Node
 		player.Start(startPosition.Position);
 
 		GetNode<Timer>("StartTimer").Start();
+
+		var hud = GetNode<Hud>("HUD");
+		hud.UpdateScore(_score);
+		hud.ShowMessage("Get Ready!");
+
+		// call_group() 函数调用组中每个节点上的删除函数——让每个怪物删除其自身。
+		GetTree().CallGroup("mobs", Node.MethodName.QueueFree);
+		// 播放音效
+		GetNode<AudioStreamPlayer>("Music").Play();
 	}
 
 	private void OnScoreTimerTimeout()
 	{
 		_score++;
+		GetNode<Hud>("HUD").UpdateScore(_score);
 	}
 
 	private void OnStartTimerTimeout()
 	{
-		GD.Print("开始刷怪");
 		GetNode<Timer>("MobTimer").Start();
 		GetNode<Timer>("ScoreTimer").Start();
 	}
@@ -50,7 +64,6 @@ public partial class Main : Node
 	private void OnMobTimerTimeout()
 
 	{
-		GD.Print("刷怪了");
 		// Create a new instance of the Mob scene.
 		Mob mob = MobScene.Instantiate<Mob>();
 
